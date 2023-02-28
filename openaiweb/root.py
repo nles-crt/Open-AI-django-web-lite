@@ -20,6 +20,7 @@ class mysql:
     def query(self,sql):
         #创建游标
         print(sql)
+        self.conn.ping(reconnect=True)
         cursor = self.conn.cursor()
         try:
             #执行sql
