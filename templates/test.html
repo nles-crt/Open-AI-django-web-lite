@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- ZUI 标准版压缩后的 CSS 文件 -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/zui/1.10.0/css/zui.min.css">
+
+    <!-- ZUI Javascript 依赖 jQuery -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/zui/1.10.0/lib/jquery/jquery.js"></script>
+    <!-- ZUI 标准版压缩后的 JavaScript 文件 -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/zui/1.10.0/js/zui.min.js"></script>
+</head>
+<body>
+
+<div class="container-fixed nav-justified">
+    <ul class="nav nav-tabs">
+        <li><a href="#">Open AI test</a></li>
+        <li class="active"><a href="/">首页</a></li>
+        <li><a href="/url">登入 <span class="label label-badge label-success">或注册</span></a></li>
+        {% if request.session.key %}
+        用户名：{{request.session.key}}
+        <li><a href="/logout">退出账号</a></li>
+        {% else %}
+        请先<a href="/url">登录</a>
+        {% endif %}
+    </ul>
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="input-control search-box search-box-circle has-icon-left has-icon-right" onclick="esd()" id="searchboxExample">
+                    <input id="inputSearchExample1" type="search" class="form-control search-input" placeholder="搜索">
+                    <label for="inputSearchExample1" class="input-control-icon-left search-icon"><i class="icon icon-search"></i></label>
+                    <a href="#" class="input-control-icon-right search-clear-btn"><i class="icon icon-remove"></i></a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <select name="picker3" id="picker3" data-placeholder="一个模式..." class="form-control">
+                    <option value="">默认256(长度越高反应越慢)</option>
+                    <option value="512" data-keys="xiaomao">长度512</option>
+                    <option value="1024" data-keys="jinyu">长度1024</option>
+                    <!-- ... -->
+                </select>
+
+
+            </div>
+        </div>
+        <br>
+        <button id="loadingBtnExample" type="button" class="btn btn-primary" data-loading-text="正在加载...">加载状态
+        </button>
+        <h2>结果</h2>
+        <p id="data">test</p>
+
+
+    </div>
+
+</div>
+</body>
+<script>
+
+    $('#loadingBtnExample').on('click', function () {
+        var $btn = $(this);
+
+        document.getElementById('data').innerHTML = '查询中';
+        var select = document.getElementById('picker3').value;
+        if (select != '') {
+            console.log(select)
+        }
+        var text = document.getElementById('inputSearchExample1').value;
+        $.ajax({
+            type: "POST",
+            url: "/queryrequest",
+            data: {
+                'text': text,
+                'max_tokens': select
+            },
+            success: function (data) {
+                console.log(data);
+                document.getElementById('data').innerHTML = JSON.stringify(data);
+
+            }
+        });
+        $btn.button('loading');
+
+        // 此处使用 setTimeout 来模拟复杂功能逻辑
+        setTimeout(function () {
+            $btn.button('reset');
+        }, 1000);
+    });
+    $('select.chosen-select').chosen({
+        no_results_text: '没有找到',    // 当检索时没有找到匹配项时显示的提示文本
+        disable_search_threshold: 10, // 10 个以下的选择项则不显示检索框
+        search_contains: true         // 从任意位置开始检索
+    });
+    // 初始化搜索框，并在选项中指定搜索文本变更事件回调函数，这样当搜索框文本发送变化时获得通知。
+   function esd() {
+         document.getElementById('inputSearchExample1').value = ''
+    };
+
+
+
+
+    $('#picker3').picker();
+
+</script>
+</html>
